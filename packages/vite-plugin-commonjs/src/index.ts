@@ -3,15 +3,17 @@ import { transformRequire, isCommonJS } from "./lib";
 import * as fs from "fs";
 import { Plugin } from "vite";
 import createFilter from "./filter";
+import { ensureArray } from './utils';
 
 export type Options = {
   include?: string | string[] | undefined;
   exclude?: string | string[] | undefined;
+  excludePackages?: string | string[] | undefined;
   skipPreBuild?: boolean;
 };
 
 export function viteCommonjs(
-  options: Options = { skipPreBuild: false }
+  options: Options = { skipPreBuild: false, excludePackages: [] }
 ): Plugin {
   const filter = createFilter(options.include, options.exclude);
   return {
@@ -25,7 +27,7 @@ export function viteCommonjs(
         return null;
       }
 
-      let result = transformRequire(code, id);
+      let result = transformRequire(code, id, ensureArray(options.excludePackages));
 
       if (id.indexOf("/node_modules/.vite/") == -1 && isCommonJS(code)) {
         return transformSync(result.code, { format: "esm" });

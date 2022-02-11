@@ -9,7 +9,7 @@ export interface TransformRequireResult {
   replaced: boolean;
 }
 
-export function transformRequire(code: string, id: string): TransformRequireResult {
+export function transformRequire(code: string, id: string, excludePackages: string[] = []): TransformRequireResult {
   let replaced = false;
   // skip if has no require
   if (!/require/.test(code)) {
@@ -29,6 +29,15 @@ export function transformRequire(code: string, id: string): TransformRequireResu
   for (let item of requireMatches) {
     if (!isString(item[1])) {
       console.warn(`Not supported dynamic import, file:${id}`);
+      continue;
+    }
+    if (excludePackages.some(packageName => {
+      try {
+        return eval(item[1]) === packageName;
+      } catch(e) {
+        return false;
+      }
+    })) {
       continue;
     }
     replaced = true;

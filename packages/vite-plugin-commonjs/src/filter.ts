@@ -1,10 +1,5 @@
 import { win32, posix } from "path";
-
-function ensureArray(thing: string) {
-  if (Array.isArray(thing)) return thing;
-  if (thing == null) return [];
-  return [thing];
-}
+import { ensureArray } from './utils';
 
 function normalizePath(filename: string) {
   return filename.split(win32.sep).join(posix.sep);
